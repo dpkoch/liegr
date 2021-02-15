@@ -3,29 +3,30 @@
 namespace liegr {
 namespace detail {
 
-template <typename E>
+template <typename Expr>
 class GroupExpression {
    public:
-    auto matrix() const { return static_cast<const E&>(*this).matrix(); }
+    auto matrix() const { return static_cast<const Expr&>(*this).matrix(); }
 };
 
-template <typename E1, typename E2>
-class GroupMultiply : public GroupExpression<GroupMultiply<E1, E2>> {
+template <typename LhsExpr, typename RhsExpr>
+class GroupMultiply : public GroupExpression<GroupMultiply<LhsExpr, RhsExpr>> {
    public:
-    GroupMultiply(const E1& lhs, const E2& rhs) : lhs_(lhs), rhs_(rhs) {}
+    GroupMultiply(const LhsExpr& lhs, const RhsExpr& rhs)
+        : lhs_(lhs), rhs_(rhs) {}
 
     auto matrix() const { return lhs_.matrix() * rhs_.matrix(); }
 
    private:
-    const E1& lhs_;
-    const E2& rhs_;
+    const LhsExpr& lhs_;
+    const RhsExpr& rhs_;
 };
 
-template <typename E1, typename E2>
-GroupMultiply<E1, E2> operator*(const GroupExpression<E1>& lhs,
-                                const GroupExpression<E2>& rhs) {
-    return GroupMultiply<E1, E2>(static_cast<const E1&>(lhs),
-                                 static_cast<const E2&>(rhs));
+template <typename LhsExpr, typename RhsExpr>
+GroupMultiply<LhsExpr, RhsExpr> operator*(const GroupExpression<LhsExpr>& lhs,
+                                          const GroupExpression<RhsExpr>& rhs) {
+    return GroupMultiply<LhsExpr, RhsExpr>(static_cast<const LhsExpr&>(lhs),
+                                           static_cast<const RhsExpr&>(rhs));
 }
 
 }  // namespace detail

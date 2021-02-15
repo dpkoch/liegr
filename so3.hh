@@ -12,8 +12,8 @@ class SO3 : public detail::GroupExpression<SO3> {
 
     SO3() { matrix_.setIdentity(); }
 
-    template <typename E>
-    SO3(const detail::GroupExpression<E>& expr) : matrix_(expr.matrix()) {}
+    template <typename Expr>
+    SO3(const detail::GroupExpression<Expr>& expr) : matrix_(expr.matrix()) {}
 
     const MatrixType& matrix() const { return matrix_; }
 

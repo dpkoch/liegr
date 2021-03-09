@@ -5,6 +5,11 @@
 namespace liegr {
 namespace detail {
 
+// Forward declare inverse expression for convenience inverse() method on base
+// SEnExpression class.
+template <typename Expr>
+class SEnInverse;
+
 template <typename Expr>
 class SEnExpression {
    public:
@@ -12,6 +17,21 @@ class SEnExpression {
     auto translation() const {
         return static_cast<const Expr&>(*this).translation();
     }
+
+    SEnInverse<Expr> inverse() const {
+        return SEnInverse<Expr>(static_cast<const Expr&>(*this));
+    }
+};
+
+template <typename Expr>
+class SEnInverse : public SEnExpression<SEnInverse<Expr>> {
+   public:
+    SEnInverse(const Expr& expr) : expr_(expr) {}
+    auto rotation() const { return expr_.rotation().inverse(); }
+    auto translation() const { return -(rotation() * expr_.translation()); }
+
+   private:
+    const Expr& expr_;
 };
 
 template <typename LhsExpr, typename RhsExpr>

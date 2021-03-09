@@ -5,10 +5,29 @@
 namespace liegr {
 namespace detail {
 
+// Forward declare inverse expression for convenience inverse() method on base
+// SOnExpression class.
+template <typename Expr>
+class SOnInverse;
+
 template <typename Expr>
 class SOnExpression {
    public:
     auto matrix() const { return static_cast<const Expr&>(*this).matrix(); }
+
+    SOnInverse<Expr> inverse() const {
+        return SOnInverse<Expr>(static_cast<const Expr&>(*this));
+    }
+};
+
+template <typename Expr>
+class SOnInverse : public SOnExpression<SOnInverse<Expr>> {
+   public:
+    SOnInverse(const Expr& expr) : expr_(expr) {}
+    auto matrix() const { return expr_.matrix().transpose(); }
+
+   private:
+    const Expr& expr_;
 };
 
 template <typename LhsExpr, typename RhsExpr>

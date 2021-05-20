@@ -45,6 +45,9 @@ class SOnProduct : public SOnExpression<SOnProduct<LhsExpr, RhsExpr>> {
 template <typename LhsExpr, typename RhsExpr>
 SOnProduct<LhsExpr, RhsExpr> operator*(const SOnExpression<LhsExpr>& lhs,
                                        const SOnExpression<RhsExpr>& rhs) {
+    EIGEN_STATIC_ASSERT_SAME_MATRIX_SIZE(decltype(lhs.matrix()),
+                                         decltype(rhs.matrix()));
+
     return SOnProduct<LhsExpr, RhsExpr>(static_cast<const LhsExpr&>(lhs),
                                         static_cast<const RhsExpr&>(rhs));
 }
@@ -52,6 +55,8 @@ SOnProduct<LhsExpr, RhsExpr> operator*(const SOnExpression<LhsExpr>& lhs,
 template <typename Expr, typename Derived>
 auto operator*(const SOnExpression<Expr>& lhs,
                const Eigen::MatrixBase<Derived>& rhs) {
+    // TODO Support allowing multiple vectors to be stacked horizontally in rhs?
+    EIGEN_STATIC_ASSERT_VECTOR_ONLY(Derived);
     return static_cast<const Expr&>(lhs).matrix() * rhs;
 }
 

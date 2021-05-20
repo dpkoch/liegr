@@ -52,6 +52,12 @@ class SEnProduct : public SEnExpression<SEnProduct<LhsExpr, RhsExpr>> {
 template <typename LhsExpr, typename RhsExpr>
 SEnProduct<LhsExpr, RhsExpr> operator*(const SEnExpression<LhsExpr>& lhs,
                                        const SEnExpression<RhsExpr>& rhs) {
+    // TODO Why doesn't this check work?
+    // EIGEN_STATIC_ASSERT_SAME_MATRIX_SIZE(decltype(lhs.rotation().matrix()),
+    //                                      decltype(rhs.rotation().matrix()));
+    // EIGEN_STATIC_ASSERT_SAME_VECTOR_SIZE(decltype(lhs.translation()),
+    //                                      decltype(rhs.translation()));
+
     return SEnProduct<LhsExpr, RhsExpr>(static_cast<const LhsExpr&>(lhs),
                                         static_cast<const RhsExpr&>(rhs));
 }
@@ -59,6 +65,8 @@ SEnProduct<LhsExpr, RhsExpr> operator*(const SEnExpression<LhsExpr>& lhs,
 template <typename Expr, typename Derived>
 auto operator*(const SEnExpression<Expr>& lhs,
                const Eigen::MatrixBase<Derived>& rhs) {
+    // TODO Support allowing multiple vectors to be stacked horizontally in rhs?
+    EIGEN_STATIC_ASSERT_VECTOR_ONLY(Derived);
     const Expr& lhs_expr = static_cast<const Expr&>(lhs);
     return lhs_expr.rotation() * rhs + lhs_expr.translation();
 }
